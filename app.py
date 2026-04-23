@@ -384,9 +384,12 @@ if __name__ == '__main__':
         print(f"Database initialization error: {e}")
         print("Starting server without database initialization...")
     
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_DEBUG', '1') == '1'
+
     print(" * Starting PhD Seminar Platform...")
-    print(" * Local access: http://localhost:5000")
+    print(f" * Local access: http://localhost:{port}")
     print(" * Mobile access: http://10.5.19.50:5000 (same network)")
     print(" * Press Ctrl+C to stop the server")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)
