@@ -342,9 +342,9 @@ def submit_feedback(seminar_id):
 
 def create_default_users():
     """Create default users for demonstration"""
-    if not User.query.filter_by(username='dean').first():
+    if not User.query.filter_by(username='dr_yenesew_mengiste').first():
         dean = User(
-            username='dean',
+            username='dr_yenesew_mengiste',
             email='dean@university.edu',
             password_hash=generate_password_hash('admin123'),
             role='dean',
@@ -359,7 +359,7 @@ def create_default_users():
             email='prof1@university.edu',
             password_hash=generate_password_hash('prof123'),
             role='professor',
-            full_name='Dr. Jane Doe',
+            full_name='Professor Dereje Hailu',
             department='Computer Science'
         )
         db.session.add(professor)
@@ -370,7 +370,7 @@ def create_default_users():
             email='student1@university.edu',
             password_hash=generate_password_hash('student123'),
             role='phd_candidate',
-            full_name='Alice Johnson',
+            full_name='Tokuma Adamu',
             department='Computer Science'
         )
         db.session.add(student)
@@ -378,9 +378,13 @@ def create_default_users():
     db.session.commit()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        create_default_users()
+    try:
+        with app.app_context():
+            db.create_all()
+            create_default_users()
+    except Exception as e:
+        print(f"Database initialization error: {e}")
+        print("Starting server without database initialization...")
     
     # Configure ngrok with authtoken (replace with your actual authtoken)
     NGROK_AUTHTOKEN = "YOUR_NGROK_AUTHTOKEN_HERE"  # User should replace this
