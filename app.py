@@ -7,7 +7,15 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'phd_seminar_secret_key_2026'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://seminarphd_user:v9upjW7xiD9zgIELi8FQlh5RAcaFPQr3@dpg-d7l24nvaqgkc73cf1vtg-a.ohio-postgres.render.com/seminarphd')
+database_url = os.environ.get(
+    'DATABASE_URL',
+    'postgresql://seminarphd_user:v9upjW7xiD9zgIELi8FQlh5RAcaFPQr3@dpg-d7l24nvaqgkc73cf1vtg-a.ohio-postgres.render.com/seminarphd'
+)
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql+pg8000://', 1)
+elif database_url.startswith('postgresql://'):
+    database_url = database_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
