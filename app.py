@@ -4,8 +4,6 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import os
-import pyngrok
-from pyngrok import ngrok
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'phd_seminar_secret_key_2026'
@@ -386,24 +384,9 @@ if __name__ == '__main__':
         print(f"Database initialization error: {e}")
         print("Starting server without database initialization...")
     
-    # Configure ngrok with authtoken (replace with your actual authtoken)
-    NGROK_AUTHTOKEN = "YOUR_NGROK_AUTHTOKEN_HERE"  # User should replace this
-    
-    if NGROK_AUTHTOKEN != "YOUR_NGROK_AUTHTOKEN_HERE":
-        try:
-            ngrok.set_auth_token(NGROK_AUTHTOKEN)
-            print("Ngrok authentication successful")
-        except Exception as e:
-            print(f"Ngrok authentication failed: {e}")
-    
-    # Start ngrok tunnel
-    try:
-        ngrok_tunnel = ngrok.connect(5000)
-        print(f" * ngrok tunnel available at: {ngrok_tunnel.public_url}")
-        print(f" * Access your PhD Seminar Platform remotely at: {ngrok_tunnel.public_url}")
-        print(f" * Local access: http://localhost:5000")
-    except Exception as e:
-        print(f"Failed to start ngrok tunnel: {e}")
-        print(" * Running locally only at: http://localhost:5000")
+    print(" * Starting PhD Seminar Platform...")
+    print(" * Local access: http://localhost:5000")
+    print(" * Mobile access: http://10.5.19.50:5000 (same network)")
+    print(" * Press Ctrl+C to stop the server")
     
     app.run(debug=True, host='0.0.0.0', port=5000)
