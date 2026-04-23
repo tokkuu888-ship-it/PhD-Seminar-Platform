@@ -7,7 +7,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'phd_seminar_secret_key_2026'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///phd_seminar.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://seminarphd_user:v9upjW7xiD9zgIELi8FQlh5RAcaFPQr3@dpg-d7l24nvaqgkc73cf1vtg-a.ohio-postgres.render.com/seminarphd')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
