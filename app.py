@@ -286,7 +286,7 @@ def create_default_users():
             email='dean@university.edu',
             password_hash=generate_password_hash('admin123'),
             role='dean',
-            full_name='Dr. John Smith',
+            full_name='Dr. Yenesew Mengiste',
             department='Computer Science'
         )
         db.session.add(dean)
