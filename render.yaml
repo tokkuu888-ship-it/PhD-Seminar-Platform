@@ -14,7 +14,7 @@ services:
           name: phd-seminar-db
           property: connectionString
       - key: PYTHON_VERSION
-        value: 3.9.16
+        value: 3.11.7
 
   # PostgreSQL Database
   - type: postgres
