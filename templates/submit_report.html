@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Progress Report - PhD Seminar Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-file-alt me-2"></i>Submit Progress Report</h2>
+            <a href="{{ url_for('seminar_detail', seminar_id=seminar.id) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Seminar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Progress Report for {{ seminar.title }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Guidelines:</strong> This one-page report helps faculty prepare for your seminar in under 5 minutes. Be concise and specific.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="chapter_focus" class="form-label">
+                            <i class="fas fa-book me-1"></i>Chapter/Methodology Focus
+                        </label>
+                        <input type="text" class="form-control" id="chapter_focus" name="chapter_focus" 
+                               placeholder="e.g., Chapter 3: Research Methodology" required>
+                        <div class="form-text">Specify the chapter or methodology being presented</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="achievements" class="form-label">
+                            <i class="fas fa-trophy text-success me-1"></i>Key Achievements
+                        </label>
+                        <textarea class="form-control" id="achievements" name="achievements" rows="3" required
+                                  placeholder="List your main accomplishments since last report..."></textarea>
+                        <div class="form-text">What have you accomplished since your last seminar?</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="challenges" class="form-label">
+                            <i class="fas fa-exclamation-triangle text-warning me-1"></i>Challenges & Obstacles
+                        </label>
+                        <textarea class="form-control" id="challenges" name="challenges" rows="3" required
+                                  placeholder="Describe any challenges you're facing..."></textarea>
+                        <div class="form-text">What difficulties are you encountering? Any roadblocks?</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="next_steps" class="form-label">
+                            <i class="fas fa-arrow-right text-info me-1"></i>Next Steps & Timeline
+                        </label>
+                        <textarea class="form-control" id="next_steps" name="next_steps" rows="3" required
+                                  placeholder="Outline your plan for the next phase..."></textarea>
+                        <div class="form-text">What are your immediate next steps and expected timeline?</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="content" class="form-label">
+                            <i class="fas fa-file-alt text-primary me-1"></i>Detailed Progress Summary
+                        </label>
+                        <textarea class="form-control" id="content" name="content" rows="6" required
+                                  placeholder="Provide a comprehensive summary of your research progress..."></textarea>
+                        <div class="form-text">
+                            <strong>Word count target: 200-300 words</strong> | 
+                            <span id="wordCount">0</span> words
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('seminar_detail', seminar_id=seminar.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>Submit Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Seminar Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Seminar Details</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Title:</strong> {{ seminar.title }}</p>
+                <p><strong>Date:</strong> {{ seminar.scheduled_date.strftime('%B %d, %Y') }}</p>
+                <p><strong>Time:</strong> {{ seminar.scheduled_date.strftime('%I:%M %p') }}</p>
+                <p><strong>Phase:</strong> {{ seminar.phase.replace('_', ' ').title() }}</p>
+                <p><strong>Duration:</strong> {{ seminar.duration_minutes }} minutes</p>
+            </div>
+        </div>
+
+        <!-- Report Guidelines -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Report Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <h6><i class="fas fa-check-circle text-success me-2"></i>Do Include:</h6>
+                <ul class="small">
+                    <li>Specific progress metrics</li>
+                    <li>Quantifiable achievements</li>
+                    <li>Clear challenges description</li>
+                    <li>Realistic next steps</li>
+                    <li>Timeline estimates</li>
+                </ul>
+                
+                <h6 class="mt-3"><i class="fas fa-times-circle text-danger me-2"></i>Avoid:</h6>
+                <ul class="small">
+                    <li>Vague statements</li>
+                    <li>Excessive technical jargon</li>
+                    <li>Unnecessary details</li>
+                    <li>Future plans without timeline</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Progress Tips -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Progress Tracking Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="progress-tip mb-2">
+                    <h6><i class="fas fa-bullseye text-primary me-2"></i>Be Specific</h6>
+                    <p class="small mb-0">Instead of "worked on chapter," say "completed literature review for Chapter 2."</p>
+                </div>
+                
+                <div class="progress-tip mb-2">
+                    <h6><i class="fas fa-percentage text-success me-2"></i>Use Percentages</h6>
+                    <p class="small mb-0">Quantify progress: "70% complete with data analysis."</p>
+                </div>
+                
+                <div class="progress-tip">
+                    <h6><i class="fas fa-calendar-alt text-info me-2"></i>Set Deadlines</h6>
+                    <p class="small mb-0">Include specific dates for next milestones.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Word count functionality
+    const contentTextarea = document.getElementById('content');
+    const wordCountSpan = document.getElementById('wordCount');
+    
+    function updateWordCount() {
+        const text = contentTextarea.value;
+        const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+        const wordCount = words.length;
+        
+        wordCountSpan.textContent = wordCount;
+        
+        // Update word count color based on target
+        if (wordCount < 200) {
+            wordCountSpan.style.color = '#dc3545'; // Red
+        } else if (wordCount > 300) {
+            wordCountSpan.style.color = '#ffc107'; // Yellow
+        } else {
+            wordCountSpan.style.color = '#28a745'; // Green
+        }
+    }
+    
+    contentTextarea.addEventListener('input', updateWordCount);
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const wordCount = parseInt(wordCountSpan.textContent);
+        
+        if (wordCount < 100) {
+            e.preventDefault();
+            alert('Your progress summary should be at least 100 words. Current count: ' + wordCount);
+            return false;
+        }
+        
+        if (wordCount > 500) {
+            const confirm = confirm('Your report is quite long (' + wordCount + ' words). Consider being more concise. Continue anyway?');
+            if (!confirm) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        return true;
+    });
+    
+    // Auto-save functionality (optional enhancement)
+    let autoSaveTimer;
+    contentTextarea.addEventListener('input', function() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(function() {
+            // This would typically save to localStorage or via AJAX
+            console.log('Auto-saving draft...');
+        }, 30000); // Auto-save after 30 seconds of inactivity
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Feedback - PhD Seminar Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-comments me-2"></i>Submit Feedback</h2>
+            <a href="{{ url_for('seminar_detail', seminar_id=seminar.id) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Seminar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>{{ feedback_type.title() }} Feedback for {{ seminar.title }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% if feedback_type == 'peer' %}
+                            <strong>Peer Review Guidelines:</strong> Provide constructive feedback as a fellow PhD candidate. Focus on clarity, methodology, and presentation structure.
+                        {% else %}
+                            <strong>Faculty Review Guidelines:</strong> Use the Sandwich Method (Positive-Corrective-Positive) to maintain student morale while providing valuable academic guidance.
+                        {% endif %}
+                    </div>
+
+                    {% if feedback_type == 'faculty' %}
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">
+                                <i class="fas fa-star text-warning me-1"></i>Overall Rating
+                            </label>
+                            <div class="rating-container">
+                                {% for i in range(5, 0, -1) %}
+                                    <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="d-none" required>
+                                    <label for="star{{ i }}" class="star-rating me-1" style="font-size: 1.5rem; cursor: pointer;">
+                                        <i class="far fa-star"></i>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">Rate the overall quality of the presentation and research progress</div>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="content" class="form-label">
+                            <i class="fas fa-comments text-primary me-1"></i>Detailed Feedback
+                        </label>
+                        <textarea class="form-control" id="content" name="content" rows="8" required
+                                  placeholder="Provide your detailed feedback here..."></textarea>
+                        <div class="form-text">
+                            <span id="charCount">0</span> characters | 
+                            <span id="wordCount">0</span> words
+                        </div>
+                    </div>
+
+                    {% if feedback_type == 'faculty' %}
+                        <div class="mb-3">
+                            <h6><i class="fas fa-lightbulb text-warning me-2"></i>Sandwich Method Template</h6>
+                            <div class="alert alert-light">
+                                <div class="mb-2">
+                                    <strong>Positive (Opening):</strong> Start with specific strengths and achievements
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Corrective (Middle):</strong> Provide constructive criticism and suggestions
+                                </div>
+                                <div>
+                                    <strong>Positive (Closing):</strong> End with encouragement and forward-looking comments
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            <h6><i class="fas fa-users text-info me-2"></i>Peer Review Focus Areas</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="clarity" onchange="addFocusArea('clarity')">
+                                        <label class="form-check-label" for="clarity">Clarity & Structure</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="methodology" onchange="addFocusArea('methodology')">
+                                        <label class="form-check-label" for="methodology">Methodology</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="presentation" onchange="addFocusArea('presentation')">
+                                        <label class="form-check-label" for="presentation">Presentation Skills</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="content" onchange="addFocusArea('content')">
+                                        <label class="form-check-label" for="content">Content Quality</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('seminar_detail', seminar_id=seminar.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Seminar Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Seminar Details</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Title:</strong> {{ seminar.title }}</p>
+                <p><strong>Presenter:</strong> {{ seminar.presenter.full_name }}</p>
+                <p><strong>Date:</strong> {{ seminar.scheduled_date.strftime('%B %d, %Y') }}</p>
+                <p><strong>Phase:</strong> {{ seminar.phase.replace('_', ' ').title() }}</p>
+                <p><strong>Your Role:</strong> {{ feedback_type.title() }}</p>
+            </div>
+        </div>
+
+        <!-- Feedback Guidelines -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Feedback Guidelines</h5>
+            </div>
+            <div class="card-body">
+                {% if feedback_type == 'peer' %}
+                    <h6><i class="fas fa-check-circle text-success me-2"></i>Peer Review Tips:</h6>
+                    <ul class="small">
+                        <li>Be supportive and constructive</li>
+                        <li>Share relevant experiences</li>
+                        <li>Suggest practical improvements</li>
+                        <li>Focus on presentation clarity</li>
+                        <li>Avoid overly technical criticism</li>
+                    </ul>
+                {% else %}
+                    <h6><i class="fas fa-check-circle text-success me-2"></i>Faculty Review Tips:</h6>
+                    <ul class="small">
+                        <li>Use the Sandwich Method</li>
+                        <li>Be specific and actionable</li>
+                        <li>Reference academic standards</li>
+                        <li>Suggest concrete next steps</li>
+                        <li>Maintain encouraging tone</li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Progress Report Summary -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Progress Report Summary</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Review the presenter's progress report to provide targeted feedback on their achievements, challenges, and next steps.
+                </p>
+                <a href="{{ url_for('seminar_detail', seminar_id=seminar.id) }}#progress-report" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-eye me-1"></i>View Progress Report
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Character and word count
+    const contentTextarea = document.getElementById('content');
+    const charCountSpan = document.getElementById('charCount');
+    const wordCountSpan = document.getElementById('wordCount');
+    
+    function updateCounts() {
+        const text = contentTextarea.value;
+        const charCount = text.length;
+        const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+        const wordCount = words.length;
+        
+        charCountSpan.textContent = charCount;
+        wordCountSpan.textContent = wordCount;
+        
+        // Update color based on length
+        if (charCount < 50) {
+            charCountSpan.style.color = '#dc3545'; // Red
+        } else if (charCount > 1000) {
+            charCountSpan.style.color = '#ffc107'; // Yellow
+        } else {
+            charCountSpan.style.color = '#28a745'; // Green
+        }
+    }
+    
+    contentTextarea.addEventListener('input', updateCounts);
+    
+    // Star rating functionality (for faculty)
+    const stars = document.querySelectorAll('.star-rating');
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const radioId = this.getAttribute('for');
+            document.getElementById(radioId).checked = true;
+            updateStars();
+        });
+    });
+    
+    function updateStars() {
+        const selectedRating = document.querySelector('input[name="rating"]:checked');
+        if (selectedRating) {
+            const rating = parseInt(selectedRating.value);
+            stars.forEach((star, index) => {
+                const starValue = 5 - index; // Since we're displaying from 5 to 1
+                const icon = star.querySelector('i');
+                if (starValue <= rating) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+            });
+        }
+    }
+    
+    // Update stars on hover
+    stars.forEach((star, index) => {
+        star.addEventListener('mouseenter', function() {
+            const starValue = 5 - index;
+            stars.forEach((s, i) => {
+                const v = 5 - i;
+                const icon = s.querySelector('i');
+                if (v <= starValue) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+            });
+        });
+    });
+    
+    document.querySelector('.rating-container').addEventListener('mouseleave', updateStars);
+    
+    // Focus area helper (for peer review)
+    window.addFocusArea = function(area) {
+        const textarea = document.getElementById('content');
+        const focusAreas = {
+            'clarity': 'Clarity & Structure: ',
+            'methodology': 'Methodology: ',
+            'presentation': 'Presentation Skills: ',
+            'content': 'Content Quality: '
+        };
+        
+        if (document.getElementById(area).checked) {
+            if (textarea.value && !textarea.value.endsWith('\n')) {
+                textarea.value += '\n\n';
+            }
+            textarea.value += focusAreas[area];
+            textarea.focus();
+        }
+    };
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const wordCount = parseInt(wordCountSpan.textContent);
+        
+        if (wordCount < 20) {
+            e.preventDefault();
+            alert('Please provide more detailed feedback (at least 20 words). Current count: ' + wordCount);
+            return false;
+        }
+        
+        return true;
+    });
+});
+</script>
+{% endblock %}

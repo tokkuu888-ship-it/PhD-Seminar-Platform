@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Seminar - PhD Seminar Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Schedule New Seminar</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading me-1"></i>Seminar Title
+                        </label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                        <div class="form-text">Be specific about the chapter or methodology being presented</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Description
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                        <div class="form-text">Provide context about the research area and specific focus</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="presenter_id" class="form-label">
+                                <i class="fas fa-user me-1"></i>Presenter
+                            </label>
+                            <select class="form-select" id="presenter_id" name="presenter_id" required>
+                                <option value="">Select PhD Candidate</option>
+                                {% for candidate in phd_candidates %}
+                                    <option value="{{ candidate.id }}">{{ candidate.full_name }} - {{ candidate.department }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="phase" class="form-label">
+                                <i class="fas fa-tasks me-1"></i>Phase
+                            </label>
+                            <select class="form-select" id="phase" name="phase">
+                                <option value="presentation">Presentation (30 min)</option>
+                                <option value="peer_review">Peer Review (15 min)</option>
+                                <option value="faculty_viva">Faculty Viva (30 min)</option>
+                                <option value="mentorship">Mentorship (15 min)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="scheduled_date" class="form-label">
+                                <i class="fas fa-calendar me-1"></i>Date
+                            </label>
+                            <input type="date" class="form-control" id="scheduled_date" name="scheduled_date" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="scheduled_time" class="form-label">
+                                <i class="fas fa-clock me-1"></i>Time
+                            </label>
+                            <input type="time" class="form-control" id="scheduled_time" name="scheduled_time" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="meeting_link" class="form-label">
+                            <i class="fas fa-video me-1"></i>Meeting Link (Optional)
+                        </label>
+                        <input type="url" class="form-control" id="meeting_link" name="meeting_link" 
+                               placeholder="https://zoom.us/j/...">
+                        <div class="form-text">Provide video conferencing link for remote participants</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('seminars') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Schedule Seminar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Phase Guidelines -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Phase Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <div class="phase-guide">
+                    <h6><i class="fas fa-presentation text-primary me-2"></i>Presentation</h6>
+                    <p class="small">30 min technical presentation of specific chapter/methodology</p>
+                    
+                    <h6 class="mt-3"><i class="fas fa-users text-purple me-2"></i>Peer Review</h6>
+                    <p class="small">15 min feedback from fellow students to reduce intimidation</p>
+                    
+                    <h6 class="mt-3"><i class="fas fa-user-tie text-danger me-2"></i>Faculty Viva</h6>
+                    <p class="small">30 min defense-style questioning from professors</p>
+                    
+                    <h6 class="mt-3"><i class="fas fa-handshake text-success me-2"></i>Mentorship</h6>
+                    <p class="small">15 min informal discussion on soft skills and publications</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduling Tips -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Scheduling Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="small">
+                    <li>Check faculty availability before scheduling</li>
+                    <li>Allow at least 2 days between seminars</li>
+                    <li>Consider time zones for remote participants</li>
+                    <li>Ensure presenter has prepared progress report</li>
+                    <li>Send reminders 24 hours before seminar</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Seminars</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small text-center">Loading recent seminars...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden field to combine date and time -->
+<input type="hidden" id="scheduled_datetime" name="scheduled_date">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Combine date and time fields
+    function updateDateTime() {
+        const date = document.getElementById('scheduled_date').value;
+        const time = document.getElementById('scheduled_time').value;
+        
+        if (date && time) {
+            const dateTimeString = date + ' ' + time;
+            document.getElementById('scheduled_datetime').value = dateTimeString;
+        }
+    }
+    
+    document.getElementById('scheduled_date').addEventListener('change', updateDateTime);
+    document.getElementById('scheduled_time').addEventListener('change', updateDateTime);
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('scheduled_date').setAttribute('min', today);
+    
+    // Update phase duration display
+    document.getElementById('phase').addEventListener('change', function() {
+        const phase = this.value;
+        const durations = {
+            'presentation': '30 minutes',
+            'peer_review': '15 minutes',
+            'faculty_viva': '30 minutes',
+            'mentorship': '15 minutes'
+        };
+        
+        // Update duration display if needed
+        console.log('Selected phase:', phase, 'Duration:', durations[phase]);
+    });
+    
+    // Load recent seminars via AJAX (placeholder)
+    function loadRecentSeminars() {
+        // This would typically make an AJAX call to get recent seminars
+        console.log('Loading recent seminars...');
+    }
+    
+    loadRecentSeminars();
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const date = document.getElementById('scheduled_date').value;
+    const time = document.getElementById('scheduled_time').value;
+    
+    if (!date || !time) {
+        e.preventDefault();
+        alert('Please select both date and time for the seminar');
+        return false;
+    }
+    
+    // Update the hidden field before submission
+    const dateTimeString = date + ' ' + time;
+    document.getElementById('scheduled_datetime').value = dateTimeString;
+});
+</script>
+{% endblock %}

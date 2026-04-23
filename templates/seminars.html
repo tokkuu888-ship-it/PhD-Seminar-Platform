@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Seminars - PhD Seminar Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-calendar me-2"></i>All Seminars</h2>
+            {% if current_user.role in ['dean', 'professor'] %}
+                <a href="{{ url_for('schedule_seminar') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>Schedule New Seminar
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="phaseFilter">
+                            <option value="">All Phases</option>
+                            <option value="presentation">Presentation</option>
+                            <option value="peer_review">Peer Review</option>
+                            <option value="faculty_viva">Faculty Viva</option>
+                            <option value="mentorship">Mentorship</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="searchFilter" placeholder="Search seminars...">
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                            <i class="fas fa-redo me-1"></i>Reset Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Seminars List -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                {% if seminars %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Presenter</th>
+                                    <th>Date & Time</th>
+                                    <th>Phase</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for seminar in seminars %}
+                                    <tr class="seminar-row" data-status="{{ seminar.status }}" data-phase="{{ seminar.phase }}">
+                                        <td>
+                                            <strong>{{ seminar.title }}</strong>
+                                            {% if seminar.description %}
+                                                <br><small class="text-muted">{{ seminar.description[:100] }}{% if seminar.description|length > 100 %}...{% endif %}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-user me-1"></i>{{ seminar.presenter.full_name }}
+                                            <br><small class="text-muted">{{ seminar.presenter.department }}</small>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-calendar me-1"></i>{{ seminar.scheduled_date.strftime('%B %d, %Y') }}
+                                            <br><small class="text-muted">{{ seminar.scheduled_date.strftime('%I:%M %p') }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge phase-badge phase-{{ seminar.phase }}">
+                                                {{ seminar.phase.replace('_', ' ').title() }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge status-badge status-{{ seminar.status }}">
+                                                {{ seminar.status.replace('_', ' ').title() }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('seminar_detail', seminar_id=seminar.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if current_user.role in ['dean', 'professor'] %}
+                                                    <button class="btn btn-sm btn-outline-warning" onclick="editSeminar('{{ seminar.id }}')">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                {% endif %}
+                                                {% if seminar.presenter_id == current_user.id and seminar.status == 'scheduled' %}
+                                                    <a href="{{ url_for('submit_report', seminar_id=seminar.id) }}" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-file-alt"></i>
+                                                    </a>
+                                                {% endif %}
+                                                {% if current_user.role in ['dean', 'professor'] %}
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteSeminar('{{ seminar.id }}')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        <h4>No Seminars Found</h4>
+                        <p class="text-muted">No seminars have been scheduled yet.</p>
+                        {% if current_user.role in ['dean', 'professor'] %}
+                            <a href="{{ url_for('schedule_seminar') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle me-2"></i>Schedule First Seminar
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Seminar Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h4>{{ seminars|length }}</h4>
+                        <p class="text-muted mb-0">Total Seminars</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>{{ seminars|selectattr('status', 'equalto', 'scheduled')|list|length }}</h4>
+                        <p class="text-muted mb-0">Scheduled</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>{{ seminars|selectattr('status', 'equalto', 'completed')|list|length }}</h4>
+                        <p class="text-muted mb-0">Completed</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>{{ seminars|selectattr('status', 'equalto', 'in_progress')|list|length }}</h4>
+                        <p class="text-muted mb-0">In Progress</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterSeminars() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const phaseFilter = document.getElementById('phaseFilter').value;
+    const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+    
+    const rows = document.querySelectorAll('.seminar-row');
+    
+    rows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        const phase = row.getAttribute('data-phase');
+        const text = row.textContent.toLowerCase();
+        
+        const statusMatch = !statusFilter || status === statusFilter;
+        const phaseMatch = !phaseFilter || phase === phaseFilter;
+        const searchMatch = !searchFilter || text.includes(searchFilter);
+        
+        if (statusMatch && phaseMatch && searchMatch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function resetFilters() {
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('phaseFilter').value = '';
+    document.getElementById('searchFilter').value = '';
+    filterSeminars();
+}
+
+function editSeminar(seminarId) {
+    // This would open an edit modal or redirect to edit page
+    alert('Edit functionality would be implemented here for seminar ' + seminarId);
+}
+
+// Add event listeners
+document.getElementById('statusFilter').addEventListener('change', filterSeminars);
+document.getElementById('phaseFilter').addEventListener('change', filterSeminars);
+document.getElementById('searchFilter').addEventListener('input', filterSeminars);
+</script>
+{% endblock %}
