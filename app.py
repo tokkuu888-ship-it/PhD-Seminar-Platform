@@ -113,6 +113,68 @@ def logout():
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        full_name = request.form.get('full_name')
+        department = request.form.get('department')
+        role = request.form.get('role')
+        
+        # Check if user already exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists', 'error')
+            return redirect(url_for('register'))
+        
+        if User.query.filter_by(email=email).first():
+            flash('Email already exists', 'error')
+            return redirect(url_for('register'))
+        
+        # Create new user
+        user = User(
+            username=username,
+            email=email,
+            password_hash=generate_password_hash(password),
+            role=role,
+            full_name=full_name,
+            department=department
+        )
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('Registration successful! Please login.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        current_user.full_name = request.form.get('full_name')
+        current_user.email = request.form.get('email')
+        current_user.department = request.form.get('department')
+        
+        # Check if password change is requested
+        new_password = request.form.get('new_password')
+        if new_password:
+            current_password = request.form.get('current_password')
+            if check_password_hash(current_user.password_hash, current_password):
+                current_user.password_hash = generate_password_hash(new_password)
+                flash('Password updated successfully', 'success')
+            else:
+                flash('Current password is incorrect', 'error')
+                return redirect(url_for('profile'))
+        
+        db.session.commit()
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('profile'))
+    
+    return render_template('profile.html')
+
 @app.route('/dashboard')
 @login_required
 def dashboard():

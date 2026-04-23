@@ -59,14 +59,8 @@ def main():
     print(f"🏠 Local Access:        http://localhost:5000")
     print("=" * 60)
     
-    print("\n📋 Demo Accounts:")
-    print("┌─────────────┬──────────────┬─────────────┐")
-    print("│    Role     │   Username   │   Password  │")
-    print("├─────────────┼──────────────┼─────────────┤")
-    print("│    Dean     │     dean     │  admin123   │")
-    print("│  Professor  │  professor1  │   prof123   │")
-    print("│ PhD Candidate│   student1   │ student123  │")
-    print("└─────────────┴──────────────┴─────────────┘")
+    print("\n📋 Platform Ready!")
+    print("Use your registered account or contact administrator for access.")
     
     print("\n🚀 Starting Flask web server...")
     print("   Press Ctrl+C to stop the server")

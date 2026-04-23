@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - PhD Seminar Platform{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Profile</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="full_name" class="form-label">
+                                <i class="fas fa-user me-1"></i>Full Name
+                            </label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" 
+                                   value="{{ current_user.full_name }}" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-1"></i>Email
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ current_user.email }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="department" class="form-label">
+                                <i class="fas fa-university me-1"></i>Department
+                            </label>
+                            <select class="form-select" id="department" name="department" required>
+                                <option value="">Select Department</option>
+                                <option value="Computer Science" {% if current_user.department == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+                                <option value="Engineering" {% if current_user.department == 'Engineering' %}selected{% endif %}>Engineering</option>
+                                <option value="Mathematics" {% if current_user.department == 'Mathematics' %}selected{% endif %}>Mathematics</option>
+                                <option value="Physics" {% if current_user.department == 'Physics' %}selected{% endif %}>Physics</option>
+                                <option value="Chemistry" {% if current_user.department == 'Chemistry' %}selected{% endif %}>Chemistry</option>
+                                <option value="Biology" {% if current_user.department == 'Biology' %}selected{% endif %}>Biology</option>
+                                <option value="Medicine" {% if current_user.department == 'Medicine' %}selected{% endif %}>Medicine</option>
+                                <option value="Business" {% if current_user.department == 'Business' %}selected{% endif %}>Business</option>
+                                <option value="Social Sciences" {% if current_user.department == 'Social Sciences' %}selected{% endif %}>Social Sciences</option>
+                                <option value="Humanities" {% if current_user.department == 'Humanities' %}selected{% endif %}>Humanities</option>
+                                <option value="Other" {% if current_user.department == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="role_display" class="form-label">
+                                <i class="fas fa-user-tag me-1"></i>Role
+                            </label>
+                            <input type="text" class="form-control" id="role_display" 
+                                   value="{{ current_user.role.replace('_', ' ').title() }}" readonly>
+                            <div class="form-text">Role cannot be changed after registration</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-id-badge me-1"></i>Username
+                            </label>
+                            <input type="text" class="form-control" id="username" 
+                                   value="{{ current_user.username }}" readonly>
+                            <div class="form-text">Username cannot be changed</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="account_status" class="form-label">
+                                <i class="fas fa-check-circle me-1"></i>Account Status
+                            </label>
+                            <input type="text" class="form-control" id="account_status" 
+                                   value="{% if current_user.is_active %}Active{% else %}Inactive{% endif %}" readonly>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6><i class="fas fa-key me-2"></i>Change Password</h6>
+                    <p class="text-muted small mb-3">Leave blank if you don't want to change your password</p>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="current_password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Current Password
+                            </label>
+                            <input type="password" class="form-control" id="current_password" name="current_password">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="new_password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>New Password
+                            </label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" minlength="6">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="confirm_new_password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Confirm New Password
+                            </label>
+                            <input type="password" class="form-control" id="confirm_new_password">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Update Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Account Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Account Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="avatar-placeholder d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle" style="width: 80px; height: 80px; font-size: 2rem;">
+                        {% if current_user.full_name %}
+                            {{ current_user.full_name.split(' ')|map(attribute='0')|join('')|upper }}
+                        {% else %}
+                            {{ current_user.username[:2]|upper }}
+                        {% endif %}
+                    </div>
+                </div>
+                <h6 class="text-center">{{ current_user.full_name }}</h6>
+                <p class="text-muted text-center small">{{ current_user.role.replace('_', ' ').title() }}</p>
+                
+                <hr>
+                
+                <div class="small">
+                    <p class="mb-1"><strong>Username:</strong> {{ current_user.username }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ current_user.email }}</p>
+                    <p class="mb-1"><strong>Department:</strong> {{ current_user.department }}</p>
+                    <p class="mb-1"><strong>Member Since:</strong> {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Your Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h4 id="seminar_count">0</h4>
+                        <small class="text-muted">Seminars</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 id="report_count">0</h4>
+                        <small class="text-muted">Reports</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 id="feedback_count">0</h4>
+                        <small class="text-muted">Feedback</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Account Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-info" onclick="exportData()">
+                        <i class="fas fa-download me-1"></i>Export My Data
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="requestDeletion()">
+                        <i class="fas fa-trash me-1"></i>Request Account Deletion
+                    </button>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load user statistics
+    loadUserStats();
+});
+
+function loadUserStats() {
+    // This would typically make an AJAX call to get user statistics
+    // For now, we'll use placeholder values
+    document.getElementById('seminar_count').textContent = '0';
+    document.getElementById('report_count').textContent = '0';
+    document.getElementById('feedback_count').textContent = '0';
+}
+
+// Password change validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const newPassword = document.getElementById('new_password').value;
+    const confirmNewPassword = document.getElementById('confirm_new_password').value;
+    const currentPassword = document.getElementById('current_password').value;
+    
+    // If user wants to change password
+    if (newPassword || confirmNewPassword) {
+        if (!currentPassword) {
+            e.preventDefault();
+            alert('Current password is required to change password');
+            return false;
+        }
+        
+        if (newPassword !== confirmNewPassword) {
+            e.preventDefault();
+            alert('New passwords do not match!');
+            return false;
+        }
+        
+        if (newPassword.length < 6) {
+            e.preventDefault();
+            alert('New password must be at least 6 characters!');
+            return false;
+        }
+    }
+    
+    return true;
+});
+
+// Password strength indicator
+document.getElementById('new_password').addEventListener('input', function() {
+    const password = this.value;
+    const strength = checkPasswordStrength(password);
+    
+    // Update strength indicator if you add one
+    console.log('Password strength:', strength);
+});
+
+function checkPasswordStrength(password) {
+    if (password.length < 6) return 'weak';
+    if (password.length < 10) return 'medium';
+    return 'strong';
+}
+
+function exportData() {
+    alert('Data export functionality would be implemented here');
+}
+
+function requestDeletion() {
+    if (confirm('Are you sure you want to request account deletion? This action cannot be undone.')) {
+        alert('Account deletion request would be submitted here');
+    }
+}
+</script>
+{% endblock %}
