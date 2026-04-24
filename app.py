@@ -387,14 +387,14 @@ if __name__ == '__main__':
     try:
         with app.app_context():
             import sqlalchemy as sa
-            # This specifically targets and deletes the broken 'user' table
-            print("🧹 Cleaning old database tables...")
+            # This deletes the 'broken' table structure left over from before
+            print("🧹 Wiping old database tables...")
             db.session.execute(sa.text('DROP TABLE IF EXISTS "user" CASCADE;'))
             db.session.commit()
             
-            # This builds fresh tables your PhD project needs
+            # This rebuilds tables with the correct columns (like 'role')
             db.create_all()
-            print("✅ PhD Seminar tables successfully recreated!")
+            print("✅ PhD Seminar database tables successfully recreated!")
             create_default_users()
     except Exception as e:
         print(f"Database initialization error: {e}")
