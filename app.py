@@ -386,9 +386,14 @@ def create_default_users():
 if __name__ == '__main__':
     try:
         with app.app_context():
-            # This will build missing tables in Render database
-            db.create_all() 
-            print("✅ PhD Seminar tables created!")
+            import sqlalchemy as sa
+            # This deletes the old, incorrect 'user' table
+            db.session.execute(sa.text('DROP TABLE IF EXISTS "user" CASCADE;'))
+            db.session.commit()
+            
+            # This creates all tables again with the correct 'role' column
+            db.create_all()
+            print("✅ PhD Seminar tables successfully recreated!")
             create_default_users()
     except Exception as e:
         print(f"Database initialization error: {e}")
