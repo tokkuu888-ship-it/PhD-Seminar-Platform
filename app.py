@@ -19,6 +19,27 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# --- ADD THIS BLOCK BELOW db = SQLAlchemy(app) ---
+with app.app_context():
+    try:
+        import sqlalchemy as sa
+        # This forces the update on Render's production server
+        print("🧹 WIPING OLD TABLES FOR PHD PLATFORM...")
+        db.session.execute(sa.text('DROP TABLE IF EXISTS "user" CASCADE;'))
+        db.session.execute(sa.text('DROP TABLE IF EXISTS seminar CASCADE;'))
+        db.session.execute(sa.text('DROP TABLE IF EXISTS feedback CASCADE;'))
+        db.session.commit()
+        
+        db.create_all()
+        print("✅ DATABASE REBUILT WITH ROLE COLUMN!")
+        
+        # This will recreate your default accounts like 'student1'
+        # We'll define the function call here or move the function up
+    except Exception as e:
+        print(f"⚠️ Initialization warning: {e}")
+# --------------------------------------------------
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -386,15 +407,6 @@ def create_default_users():
 if __name__ == '__main__':
     try:
         with app.app_context():
-            import sqlalchemy as sa
-            # This deletes the 'broken' table structure left over from before
-            print("🧹 Wiping old database tables...")
-            db.session.execute(sa.text('DROP TABLE IF EXISTS "user" CASCADE;'))
-            db.session.commit()
-            
-            # This rebuilds tables with the correct columns (like 'role')
-            db.create_all()
-            print("✅ PhD Seminar database tables successfully recreated!")
             create_default_users()
     except Exception as e:
         print(f"Database initialization error: {e}")
