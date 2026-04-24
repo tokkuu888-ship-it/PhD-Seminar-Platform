@@ -16,16 +16,15 @@ if database_url:
     elif database_url.startswith('postgresql://'):
         database_url = database_url.replace('postgresql://', 'postgresql+pg8000://', 1)
     
-    # 2. Fix the sslmode error
-    # pg8000 doesn't like '?sslmode=require'. 
-    # If it's there, we remove it from the string.
-    if '?sslmode=require' in database_url:
-        database_url = database_url.replace('?sslmode=require', '')
+    # 2. Clean EVERYTHING after the database name
+    # This removes ?sslmode=require, &channel_binding=require, etc.
+    if '?' in database_url:
+        database_url = database_url.split('?')[0]
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# 3. Tell pg8000 to use SSL correctly via engine_options
+# 3. Explicitly enable SSL the way pg8000 likes it
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "connect_args": {"ssl_context": True}
 }
