@@ -386,7 +386,9 @@ def create_default_users():
 if __name__ == '__main__':
     try:
         with app.app_context():
-            db.create_all()
+            # This will build missing tables in Render database
+            db.create_all() 
+            print("✅ PhD Seminar tables created!")
             create_default_users()
     except Exception as e:
         print(f"Database initialization error: {e}")
