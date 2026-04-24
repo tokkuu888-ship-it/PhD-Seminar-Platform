@@ -32,9 +32,8 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 db = SQLAlchemy(app)
 
 with app.app_context():
-    # Since this is a new database, we just need create_all()
     db.create_all()
-    print("✅ Fresh PhD Seminar tables created on Neon!")
+    print("✅ Database tables created successfully!")
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
