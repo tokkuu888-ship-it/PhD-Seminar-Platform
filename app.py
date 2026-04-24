@@ -20,21 +20,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# MOVE THIS BLOCK HERE (Outside of any if __name__ == '__main__')
 with app.app_context():
-    try:
-        import sqlalchemy as sa
-        # This deletes the table structure that is causing the crash
-        print("🧹 REBUILDING DATABASE FOR PHD PLATFORM...")
-        db.session.execute(sa.text('DROP TABLE IF EXISTS "user" CASCADE;'))
-        db.session.execute(sa.text('DROP TABLE IF EXISTS seminar CASCADE;'))
-        db.session.commit()
-        
-        # This creates the correct tables including the 'role' column
-        db.create_all()
-        print("✅ DATABASE SUCCESSFULLY UPDATED!")
-    except Exception as e:
-        print(f"Database Reset Warning: {e}")
+    # Since this is a new database, we just need create_all()
+    db.create_all()
+    print("✅ Fresh PhD Seminar tables created on Neon!")
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
