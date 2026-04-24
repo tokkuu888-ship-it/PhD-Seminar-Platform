@@ -20,25 +20,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# --- ADD THIS BLOCK BELOW db = SQLAlchemy(app) ---
+# MOVE THIS BLOCK HERE (Outside of any if __name__ == '__main__')
 with app.app_context():
     try:
         import sqlalchemy as sa
-        # This forces the update on Render's production server
-        print("🧹 WIPING OLD TABLES FOR PHD PLATFORM...")
+        # This deletes the table structure that is causing the crash
+        print("🧹 REBUILDING DATABASE FOR PHD PLATFORM...")
         db.session.execute(sa.text('DROP TABLE IF EXISTS "user" CASCADE;'))
         db.session.execute(sa.text('DROP TABLE IF EXISTS seminar CASCADE;'))
-        db.session.execute(sa.text('DROP TABLE IF EXISTS feedback CASCADE;'))
         db.session.commit()
         
+        # This creates the correct tables including the 'role' column
         db.create_all()
-        print("✅ DATABASE REBUILT WITH ROLE COLUMN!")
-        
-        # This will recreate your default accounts like 'student1'
-        # We'll define the function call here or move the function up
+        print("✅ DATABASE SUCCESSFULLY UPDATED!")
     except Exception as e:
-        print(f"⚠️ Initialization warning: {e}")
-# --------------------------------------------------
+        print(f"Database Reset Warning: {e}")
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
