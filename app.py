@@ -32,8 +32,12 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 db = SQLAlchemy(app)
 
 with app.app_context():
-    db.create_all()
-    print("✅ Database tables created successfully!")
+    try:
+        # This creates the tables in your new Neon phd_seminar_db
+        db.create_all()
+        print("🚀 NEON DATABASE INITIALIZED: Tables Created!")
+    except Exception as e:
+        print(f"❌ Initialization Error: {e}")
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
