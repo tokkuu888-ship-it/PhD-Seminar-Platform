@@ -7,16 +7,28 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'phd_seminar_secret_key_2026'
-database_url = os.environ.get(
-    'DATABASE_URL',
-    'postgresql://seminarphd_user:v9upjW7xiD9zgIELi8FQlh5RAcaFPQr3@dpg-d7l24nvaqgkc73cf1vtg-a.ohio-postgres.render.com/seminarphd'
-)
-if database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql+pg8000://', 1)
-elif database_url.startswith('postgresql://'):
-    database_url = database_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # 1. Standardize the prefix for pg8000
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql+pg8000://', 1)
+    elif database_url.startswith('postgresql://'):
+        database_url = database_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+    
+    # 2. Fix the sslmode error
+    # pg8000 doesn't like '?sslmode=require'. 
+    # If it's there, we remove it from the string.
+    if '?sslmode=require' in database_url:
+        database_url = database_url.replace('?sslmode=require', '')
+
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# 3. Tell pg8000 to use SSL correctly via engine_options
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "connect_args": {"ssl_context": True}
+}
 
 db = SQLAlchemy(app)
 
